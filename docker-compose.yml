@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment: { POSTGRES_USER: app, POSTGRES_PASSWORD: app, POSTGRES_DB: postgres }
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data", "./infra/init.sql:/docker-entrypoint-initdb.d/init.sql:ro"]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U app"], interval: 5s, timeout: 3s, retries: 20 }
+  url-service:
+    build: { context: ., dockerfile: url-service/Dockerfile }
+    environment: { SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/urls, SPRING_DATASOURCE_USERNAME: app, SPRING_DATASOURCE_PASSWORD: app, ANALYTICS_URL: http://analytics-service:8082, APP_BASE_URL: http://localhost:8081 }
+    ports: ["8081:8081"]
+    depends_on: { postgres: { condition: service_healthy }, analytics-service: { condition: service_started } }
+  analytics-service:
+    build: { context: ., dockerfile: analytics-service/Dockerfile }
+    environment: { SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/analytics, SPRING_DATASOURCE_USERNAME: app, SPRING_DATASOURCE_PASSWORD: app }
+    ports: ["8082:8082"]
+    depends_on: { postgres: { condition: service_healthy } }
+  orchestrator-service:
+    build: { context: ., dockerfile: orchestrator-service/Dockerfile }
+    ports: ["8083:8083"]
+volumes: { pgdata: {} }

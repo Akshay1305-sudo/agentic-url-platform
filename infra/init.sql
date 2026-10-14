@@ -1,0 +1,2 @@
+CREATE DATABASE urls;
+CREATE DATABASE analytics;

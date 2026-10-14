@@ -1,0 +1,22 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: url-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/urls}
+    username: ${SPRING_DATASOURCE_USERNAME:app}
+    password: ${SPRING_DATASOURCE_PASSWORD:app}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+analytics:
+  url: ${ANALYTICS_URL:http://localhost:8082}
+app:
+  base-url: ${APP_BASE_URL:http://localhost:8081}

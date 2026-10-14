@@ -1,0 +1,1 @@
+package com.example.analytics; import org.springframework.data.jpa.repository.JpaRepository; import java.util.*; public interface ClickEventRepository extends JpaRepository<ClickEvent,Long>{long countByCode(String code); List<ClickEvent> findTop100ByCodeOrderByClickedAtDesc(String code);}
